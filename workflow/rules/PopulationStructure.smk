@@ -1,12 +1,55 @@
+rule mask_inversions:
+    """
+    Mask inversions in vcf files
+    """
+    input:
+        vcf = "resources/vcfs/wholegenome/{sample_set}.vcf.gz",
+        csi = "resources/vcfs/wholegenome/{sample_set}.vcf.gz.csi",
+        tbi = "resources/vcfs/wholegenome/{sample_set}.vcf.gz.tbi",
+    output:
+        vcf = "resources/vcfs/wholegenome.masked/{sample_set}.vcf.gz"
+    log:
+        log = "logs/mask_inversions/{sample_set}.log"
+    params:
+        mask_2la = "2RL:81545105-104545105",
+        mask_2rbc = "2RL:18000000-32000000",
+    shell:
+        """
+        bcftools view -t ^{params.mask_2la},^{params.mask_2rbc} -O z -o {output.vcf} {input.vcf} 2> {log}
+        """
+
+rule BcftoolsIndex_masked:
+    input:
+        vcf = "resources/vcfs/wholegenome.masked/{sample_set}.vcf.gz"
+    output:
+        vcf_gz = "resources/vcfs/wholegenome.masked/{sample_set}.vcf.gz.csi",
+    log:
+        "logs/bcftoolsIndex/{sample_set}_masked.log",
+    shell:
+        """
+        bcftools index {input.vcf} 2> {log}
+        """
+
+rule Tabix_masked:
+    input:
+        vcf = "resources/vcfs/wholegenome.masked/{sample_set}.vcf.gz"
+    output:
+        vcf_tbi = "resources/vcfs/wholegenome.masked/{sample_set}.vcf.gz.tbi",
+    log:
+        "logs/tabix/{sample_set}.masked.log"
+    shell:
+        """
+        tabix {input.vcf} 2> {log}
+        """
 
 rule ngsRelate:
     """
     Run NGSRelate on VCF files
     """
     input:
-        vcf = "resources/vcfs/wholegenome/{sample_set}.vcf.gz",
-        csi = "resources/vcfs/wholegenome/{sample_set}.vcf.gz.csi",
-        tbi = "resources/vcfs/wholegenome/{sample_set}.vcf.gz.tbi",
+        vcf = "resources/vcfs/wholegenome.masked/{sample_set}.vcf.gz",
+        csi = "resources/vcfs/wholegenome.masked/{sample_set}.vcf.gz.csi",
+        tbi = "resources/vcfs/wholegenome.masked/{sample_set}.vcf.gz.tbi",
     output:
         "results/relatedness/ngsRelate.{sample_set}"
     log:
