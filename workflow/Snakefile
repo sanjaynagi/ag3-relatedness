@@ -10,8 +10,8 @@ dataset = config['dataset']
 sample_sets = config['sample_sets']
 
 import malariagen_data
-ag3 = malariagen_data.Ag3()
-df_samples = ag3.sample_metadata(sample_sets=ag3_sample_sets)
+ag3 = malariagen_data.Ag3(gcs_cache=config['gcs_cache'], results_cache=config['results_cache'])
+df_samples = ag3.sample_metadata(sample_sets=sample_sets)
 
 rule all:
     input:

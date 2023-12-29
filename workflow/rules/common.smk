@@ -32,27 +32,6 @@ def getVCFs(gz=True, allcontigs=False, allcontigsseparately=False):
 
 
 
-# def getSelectedOutputs(wildcards):
-
-#     """
-#     Function that returns a list of the desired outputs for the rule all, depending on the config.yaml
-#     configuration file.
-#     """
-
-#     selected_input = []
-   
-#     if config['Relatedness']['activate']:
-#         selected_input.extend(
-#             expand(
-#                 "results/relatedness/ngsRelate.{sample_set}",
-#             sample_set=sample_sets,
-#             )
-#         )
-
-#     return(selected_input)
-
-
-
 def singleTrue(iterable):
     iterator = iter(iterable)
 #    # consume from "i" until first true or it's exhausted

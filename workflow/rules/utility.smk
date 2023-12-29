@@ -1,47 +1,31 @@
-
-
-rule GenomeIndex:
-    """
-    Index the reference genome with samtools
-    """
-    input:
-        ref=config["reference"]["genome"],
-    output:
-        idx=config["reference"]["genome"] + ".fai",
-    log:
-        "logs/GenomeIndex.log",
-    wrapper:
-        "v0.69.0/bio/samtools/faidx"
-
 rule ZarrToHaplotypesVCF:
     """
     Write out haplotypes VCF files from provided malariagen_data
     """
     output:
-        haplotypeVCF = expand("resources/vcfs/{dataset}_{{contig}}.haplotypes.vcf", dataset=dataset)
+        haplotypeVCF = "resources/vcfs/{sample_set}.{contig}.vcf"
     conda:
         "../envs/pythonGenomics.yaml"
     log:
-        "logs/ZarrToVCF_haplotypes/{contig}.log"
+        "logs/ZarrToVCF_haplotypes/{sample_set}.{contig}.log"
     params:
-        ag3_sample_sets = ag3_sample_sets,
         basedir=workflow.basedir,
         dataset=dataset
     script:
         "../scripts/ZarrToVCF_haplotypes.py"
 
 
-gzippedVCF = getVCFs(gz=True, bothAllelisms=True)
+gzippedVCF = getVCFs(gz=True)
 rule BGZip:
     """
     This is overwriting log files at the
     """
     input:
-        calls = getVCFs(gz=False, bothAllelisms=True)
+        calls = getVCFs(gz=False)
     output:
         calls_gz = gzippedVCF
     log:
-        "logs/bgzip/{contig}_{allelism}.log" if config['VCF']['activate'] is False else "logs/bgzip/{contig}.log"
+        "logs/bgzip/{contig}.log"
     shell:
         """
         bgzip {input.calls} 2> {log}
@@ -51,9 +35,9 @@ rule BcftoolsIndex:
     input:
         calls = getVCFs(gz=True)
     output:
-        calls_gz = "resources/vcfs/{dataset}_{contig}.{allelism}.vcf.gz.csi",
+        calls_gz = "resources/vcfs/{sample_set}.{contig}.vcf.gz.csi",
     log:
-        "logs/bcftoolsIndex/{dataset}_{contig}.{allelism}.log",
+        "logs/bcftoolsIndex/{sample_set}_{contig}.log",
     shell:
         """
         bcftools index {input.calls} 2> {log}
@@ -63,9 +47,9 @@ rule Tabix:
     input:
         calls = getVCFs(gz=True)
     output:
-        calls_tbi = "resources/vcfs/{dataset}_{contig}.{allelism}.vcf.gz.tbi",
+        calls_tbi = "resources/vcfs/{sample_set}.{contig}.vcf.gz.tbi",
     log:
-        "logs/tabix/{dataset}_{contig}_{allelism}.log",
+        "logs/tabix/{sample_set}_{contig}.log",
     shell:
         """
         tabix {input.calls} 2> {log}
@@ -74,13 +58,13 @@ rule Tabix:
 
 rule concatVCFs:
     input:
-        calls = lambda wildcards: getVCFs(gz=True, allelism=wildcards.allelism, allcontigs=False, allcontigsseparately=True),
-        tbi = lambda wildcards: [vcf+".tbi" for vcf in getVCFs(gz=True, allelism=wildcards.allelism, allcontigs=False, allcontigsseparately=True)],
-        csi = lambda wildcards: [vcf+".csi" for vcf in getVCFs(gz=True, allelism=wildcards.allelism, allcontigs=False, allcontigsseparately=True)],
+        calls = lambda wildcards: getVCFs(gz=True, allcontigs=False, allcontigsseparately=True),
+        tbi = lambda wildcards: [vcf+".tbi" for vcf in getVCFs(gz=True, allcontigs=False, allcontigsseparately=True)],
+        csi = lambda wildcards: [vcf+".csi" for vcf in getVCFs(gz=True, allcontigs=False, allcontigsseparately=True)],
     output:
-        cattedVCF = "resources/vcfs/wholegenome/{dataset}.{allelism}.vcf.gz",
+        cattedVCF = "resources/vcfs/wholegenome/{sample_set}.vcf.gz",
     log:
-        "logs/bcftoolsConcat/{dataset}.{allelism}.log",
+        "logs/bcftoolsConcat/{sample_set}.log",
     threads: 8
     shell:
         """
@@ -90,23 +74,24 @@ rule concatVCFs:
 
 rule BcftoolsIndex_cattedVCF:
     input:
-        calls = lambda wildcards: getVCFs(gz=True, allelism=wildcards.allelism, allcontigs=True)
+        calls = lambda wildcards: getVCFs(gz=True, allcontigs=True)
     output:
-        calls_gz = "resources/vcfs/wholegenome/{dataset}.{allelism}.vcf.gz.csi",
+        calls_gz = "resources/vcfs/wholegenome/{sample_set}.vcf.gz.csi",
     log:
-        "logs/bcftoolsIndex/{dataset}.{allelism}.log",
+        "logs/bcftoolsIndex/{sample_set}.log",
     shell:
         """
         bcftools index {input.calls} 2> {log}
         """
 
+
 rule Tabix_cattedVCF:
     input:
-        calls = lambda wildcards: getVCFs(gz=True, allelism=wildcards.allelism, allcontigs=True)
+        calls = lambda wildcards: getVCFs(gz=True, allcontigs=True)
     output:
-        calls_tbi = "resources/vcfs/wholegenome/{dataset}.{allelism}.vcf.gz.tbi",
+        calls_tbi = "resources/vcfs/wholegenome/{sample_set}.vcf.gz.tbi",
     log:
-        "logs/tabix/{dataset}_{allelism}.log",
+        "logs/tabix/{sample_set}.log",
     shell:
         """
         tabix {input.calls} 2> {log}
