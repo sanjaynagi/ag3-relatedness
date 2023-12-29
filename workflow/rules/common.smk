@@ -16,9 +16,9 @@ def getVCFs(gz=True, allcontigs=False, allcontigsseparately=False):
 
     if allcontigs == False:
         if gz == True:
-            genotypes = expand("resources/vcfs/{sample_set}.{{contig}}.vcf.gz", sample_set=sample_sets)
+            genotypes = expand("resources/vcfs/{sample_set}_{{contig}}.vcf.gz", sample_set=sample_sets)
         elif gz == False:
-            genotypes = expand("resources/vcfs/{sample_set}.{{contig}}.vcf", sample_set=sample_sets)
+            genotypes = expand("resources/vcfs/{sample_set}_{{contig}}.vcf", sample_set=sample_sets)
     elif allcontigs == True:
         if gz == True:
             genotypes =  expand("resources/vcfs/wholegenome/{sample_set}.vcf.gz", sample_set=sample_sets)

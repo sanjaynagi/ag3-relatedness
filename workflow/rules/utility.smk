@@ -3,11 +3,13 @@ rule ZarrToHaplotypesVCF:
     Write out haplotypes VCF files from provided malariagen_data
     """
     output:
-        haplotypeVCF = "resources/vcfs/{sample_set}.{contig}.vcf"
+        haplotypeVCF = "resources/vcfs/{sample_set}_{contig}.vcf"
     conda:
         "../envs/pythonGenomics.yaml"
     log:
-        "logs/ZarrToVCF_haplotypes/{sample_set}.{contig}.log"
+        "logs/ZarrToVCF_haplotypes/{sample_set}_{contig}.log"
+    resources:
+        tot=1
     params:
         basedir=workflow.basedir,
         dataset=dataset
@@ -35,7 +37,7 @@ rule BcftoolsIndex:
     input:
         calls = getVCFs(gz=True)
     output:
-        calls_gz = "resources/vcfs/{sample_set}.{contig}.vcf.gz.csi",
+        calls_gz = "resources/vcfs/{sample_set}_{contig}.vcf.gz.csi",
     log:
         "logs/bcftoolsIndex/{sample_set}_{contig}.log",
     shell:
@@ -47,7 +49,7 @@ rule Tabix:
     input:
         calls = getVCFs(gz=True)
     output:
-        calls_tbi = "resources/vcfs/{sample_set}.{contig}.vcf.gz.tbi",
+        calls_tbi = "resources/vcfs/{sample_set}_{contig}.vcf.gz.tbi",
     log:
         "logs/tabix/{sample_set}_{contig}.log",
     shell:
