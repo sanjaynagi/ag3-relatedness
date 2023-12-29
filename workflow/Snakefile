@@ -1,74 +1,23 @@
-## Snakefile for genomic surviellance of Anopheles gambiae
 import pandas as pd
 import numpy as np
 
-configfile: "config/config.local_example.yaml"
+configfile: "config/config.yaml"
 include: "rules/common.smk"
 
 # dataset
 contigs = config['contigs']
 dataset = config['dataset']
-cloud = config['VObsCloud']['activate']
-ag3_sample_sets = config['VObsCloud']['sample_sets']
+sample_sets = config['sample_sets']
 
-configInputs = [cloud, config['Zarr']['activate'], config['VCF']['activate']]
-assert any(configInputs), "Cloud, Zarr and VCF input are all deactivated. Please activate one in the specified config file!"
-assert singleTrue(configInputs), "More than one of Cloud, Zarr and VCF input are activated, Please only activate one in the specified config file!"
-
-# Load metadata 
-if cloud:
-    import malariagen_data
-    ag3 = malariagen_data.Ag3()
-    metadata = ag3.sample_metadata(sample_sets=ag3_sample_sets)
-else:
-    metadata = pd.read_csv(config['metadata'], sep="\t")
-
-# Determine cohorts for each analysis
-cohorts = getCohorts(metadata,  columns=config['metadataCohortColumns'], minPopSize=15) # general analyses
-PCAcohorts = getCohorts(metadata, columns=config['PopulationStructure']['PCA']['colourColumns']) # PCA
-
-if config['Selection']['PBS']['activate']:
-    PBScohorts = getCohorts(metadata, columns=config['metadataCohortColumns'], comparatorColumn=config['Selection']['PBS']['metadataComparatorColumn'], minPopSize=15)
-    PBScohorts = PBScohorts.dropna()
-else:
-    PBScohorts = getCohorts(metadata,  columns=config['metadataCohortColumns'], minPopSize=15)
-
+# import malariagen_data
+# ag3 = malariagen_data.Ag3(gcs_cache=config['gcs_cache'], results_cache=config['results_cache'])
+# df_samples = ag3.sample_metadata(sample_sets=sample_sets)
 
 rule all:
     input:
-        getSelectedOutputs,
-        expand("resources/vcfs/{dataset}_{contig}.haplotypes.vcf", dataset=dataset, contig=contigs),
-        expand("resources/vcfs/wholegenome/{dataset}.{allelism}.vcf.gz.tbi", dataset=dataset, allelism='haplotypes')
-
+        expand("resources/vcfs/{sample_set}_{contig}.vcf", sample_set=sample_sets, contig=contigs),
+        expand("resources/vcfs/wholegenome/{sample_set}.vcf.gz.tbi", sample_set=sample_sets),
+        expand("results/relatedness/ngsRelate.{sample_set}", sample_set=sample_sets)
 
 include: "rules/utility.smk"
-include: "rules/qc.smk"
 include: "rules/PopulationStructure.smk"
-include: "rules/selection.smk"
-#include: "rules/karyotype.smk"
-
-### plan for inputs 
-# if Zarr present and VCF not, write lightweight VCF to file.
-# if VCF present and Zarr not, write Zarrs to file
-# Use Zarrs for all python analyses.
-# Use VCFs for programs that require VCF
-# How to determine name of VCF or Zarrs? use input function, if VCF provided use provided name, if 
-# not provided, use default name. Same for Zarr. 
-# provide metadata column name to split into populations (i.e location), optionally, provide multiple columns to split 
-# into groups i.e location | species | year. 
-# 
-# Need to figure out what to with colours. Give colour column? 
-#
-# choose ngsRelate contigs 
-# AgMONITOR
-# 
-# VOI - Bokeh plots, all VOIs, map of sample area showing predicted AFs
-# some sort of 2d spatial interpolation of allele frequencies, or likelihood based geostatistic modelling
-#
-#
-# PopulationStructure
-# 
-# - doubleton sharing, haplotype sharing, IBD tracts 
-# 
-# diversity 
-# - conf intervals 

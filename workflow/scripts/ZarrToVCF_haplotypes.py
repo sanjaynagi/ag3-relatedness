@@ -107,26 +107,26 @@ def write_vcf_header(vcf_file, contig):
 
 import sys
 
-
-# Zarr to VCF # 
-ag3_sample_sets = ["1288-VO-UG-DONNELLY-VMF00168","1288-VO-UG-DONNELLY-VMF00219"] #'1244-VO-GH-YAWSON-VMF00149'  #snakemake.params['ag3_sample_sets'] if cloud else []
-contig = sys.argv[1] #'2L' #snakemake.wildcards['contig']
-dataset = 'llineup' #snakemake.params['dataset']
+sample_set = snakemake.wildcards['sample_set'] #["1288-VO-UG-DONNELLY-VMF00168","1288-VO-UG-DONNELLY-VMF00219"] #'1244-VO-GH-YAWSON-VMF00149' 
+analysis = 'gamb_colu_arab'
+contig = snakemake.wildcards['contig']
+dataset = snakemake.params['dataset']
 sampleNameColumn = 'partner_sample_id'
-sample_query = 'taxon == "gambiae"'
+#sample_query = snakemake.params['sample_query']
+sample_query = None
 
 import malariagen_data
-ag3 = malariagen_data.Ag3(pre=True)
-metadata = ag3.sample_metadata(sample_sets=ag3_sample_sets, sample_query=sample_query)
+ag3 = malariagen_data.Ag3(pre=True, gcs_cache='gcs_cache', results_cache='results_cache')
+metadata = ag3.sample_metadata(sample_sets=sample_set, sample_query=sample_query)
 
 print(f"Running for {contig}...")
 
 ### MAIN ####
 ZarrToPandasToHaplotypeVCF(
-     f"resources/vcfs/{dataset}_{contig}.haplotypes.vcf", 
+     f"resources/vcfs/{sample_set}_{contig}.vcf", 
      metadata=metadata,
      sample_query=sample_query,
      contig=contig, 
      nchunks=20, 
-     sample_sets=ag3_sample_sets
+     sample_sets=sample_set
     )

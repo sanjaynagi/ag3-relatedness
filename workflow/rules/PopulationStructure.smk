@@ -1,113 +1,16 @@
 
-
-rule pca:
-    """
-    Perform principal components analysis 
-    """
-    input:
-        genotypes = getZarrArray(type_="Genotypes", cloud=cloud),
-        positions = getZarrArray(type_='Positions', cloud=cloud),
-        siteFilters = getZarrArray(type_ = "SiteFilters", cloud=cloud),
-    output:
-        htmlAll = expand("results/PCA/{dataset}.{{contig}}.html", dataset = dataset),
-        pngAll = expand("results/PCA/{dataset}.{{contig}}.png", dataset = dataset),
-        html = expand("results/PCA/{cohort}.{{contig}}.html", cohort=PCAcohorts['cohortNoSpaceText']),
-        png = expand("results/PCA/{cohort}.{{contig}}.png", cohort=PCAcohorts['cohortNoSpaceText']),
-    log:
-        log = "logs/pca/{contig}.log"
-    conda:
-        "../envs/pythonGenomics.yaml"
-    params:
-        metadata = config['metadata'],
-        dataset = config['dataset'],
-        data = "results/PCA/data",
-        cohortColumn = config['PopulationStructure']['PCA']['colourColumns'],
-        cloud = cloud,
-        ag3_sample_sets = ag3_sample_sets
-    script:
-        "../scripts/pca.py"
-
-
-
-#rule haploNet_Zarr2npy:#
-#
-#
-#rule haploNet_train:#
-#
-#rule haplonet_admix: #
-#
-#
-#rule haplonet_pca:
-
-
-
-
-
-
-rule f2VariantLocate:
-    """
-    Find lengths of haplotypes
-    """
-    input:
-        genotypes = getZarrArray(type_="Genotypes", cloud=cloud),
-        positions = getZarrArray(type_='Positions', cloud=cloud),
-        sitefilters = getZarrArray(type_='SiteFilters', cloud=cloud),
-    output:
-        f2variantPairs = "results/f2variantPairs.tsv"
-    log:
-        log = "logs/f2variants/f2VariantLocate.log"
-    conda:
-        "../envs/pythonGenomics.yaml"
-    params:
-        metadata = config['metadata'],
-        genotypes = getZarrArray(type_="Genotypes", cloud=cloud),
-        positions = getZarrArray(type_='Positions', cloud=cloud),
-        cloud = cloud,
-        contigs = contigs,
-        ag3_sample_sets = ag3_sample_sets
-    script:
-        "../scripts/f2VariantLocate.py"
-
-
-
-rule f2HapLength:
-    """
-    Find lengths of haplotypes
-    """
-    input:
-        genotypes = getZarrArray(type_="Genotypes", cloud=cloud),
-        positions = getZarrArray(type_='Positions', cloud=cloud),
-        f2variantPairs = "results/f2variantPairs.tsv"
-    output:
-        "results/f2HapLengths_{contig}.tsv"
-    log:
-        log = "logs/f2variants/hapLength_{contig}.log"
-    conda:
-        "../envs/pythonGenomics.yaml"
-    params:
-        metadata = config['metadata'],
-        genotypes = getZarrArray(type_="Genotypes", cloud=cloud),
-        positions = getZarrArray(type_='Positions', cloud=cloud),
-        cloud = cloud,
-        ag3_sample_sets = ag3_sample_sets
-    script:
-        "../scripts/f2HaplotypeLength.py"
-
-
-
-
 rule ngsRelate:
     """
     Run NGSRelate on VCF files
     """
     input:
-        vcf = "resources/vcfs/wholegenome/{dataset}.biallelic.vcf.gz",
-        csi = "resources/vcfs/wholegenome/{dataset}.biallelic.vcf.gz.csi",
-        tbi = "resources/vcfs/wholegenome/{dataset}.biallelic.vcf.gz.tbi",
+        vcf = "resources/vcfs/wholegenome/{sample_set}.vcf.gz",
+        csi = "resources/vcfs/wholegenome/{sample_set}.vcf.gz.csi",
+        tbi = "resources/vcfs/wholegenome/{sample_set}.vcf.gz.tbi",
     output:
-        "results/relatedness/ngsRelate.{dataset}"
+        "results/relatedness/ngsRelate.{sample_set}"
     log:
-        log = "logs/ngsRelate/{dataset}.log"
+        log = "logs/ngsRelate/{sample_set}.log"
     params:
         tag = 'GT',
         basedir=workflow.basedir,
