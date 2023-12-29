@@ -15,8 +15,8 @@ sample_sets = config['sample_sets']
 
 rule all:
     input:
-        expand("resources/vcfs/{sample_set}_{contig}.vcf", sample_set=sample_sets, contig=contigs),
-        expand("resources/vcfs/wholegenome/{sample_set}.vcf.gz.tbi", sample_set=sample_sets),
+        # expand("resources/vcfs/{sample_set}_{contig}.vcf", sample_set=sample_sets, contig=contigs),
+        # expand("resources/vcfs/wholegenome/{sample_set}.vcf.gz.tbi", sample_set=sample_sets),
         expand("results/relatedness/ngsRelate.{sample_set}", sample_set=sample_sets)
 
 include: "rules/utility.smk"

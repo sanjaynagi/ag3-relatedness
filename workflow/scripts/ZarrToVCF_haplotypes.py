@@ -10,10 +10,8 @@ import sys
 #sys.stderr = open(snakemake.log[0], "w")
 
 import numpy as np
-import zarr
 import pandas as pd
 import allel
-import dask.array as da
 from datetime import date
 from pathlib import Path
 
