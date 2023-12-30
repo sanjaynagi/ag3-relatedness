@@ -9,14 +9,15 @@ contigs = config['contigs']
 dataset = config['dataset']
 sample_sets = config['sample_sets']
 
-# import malariagen_data
-# ag3 = malariagen_data.Ag3(gcs_cache=config['gcs_cache'], results_cache=config['results_cache'])
+#import malariagen_data
+#ag3 = malariagen_data.Ag3(gcs_cache=config['gcs_cache'], results_cache=config['results_cache'])
 # df_samples = ag3.sample_metadata(sample_sets=sample_sets)
+#ample_sets = ag3.sample_sets(sample_sets)
 
 rule all:
     input:
-        # expand("resources/vcfs/{sample_set}_{contig}.vcf", sample_set=sample_sets, contig=contigs),
-        # expand("resources/vcfs/wholegenome/{sample_set}.vcf.gz.tbi", sample_set=sample_sets),
+        # expand("results/vcfs/{sample_set}_{contig}.vcf", sample_set=sample_sets, contig=contigs),
+        # expand("results/vcfs/wholegenome/{sample_set}.vcf.gz.tbi", sample_set=sample_sets),
         expand("results/relatedness/ngsRelate.{sample_set}", sample_set=sample_sets)
 
 include: "rules/utility.smk"

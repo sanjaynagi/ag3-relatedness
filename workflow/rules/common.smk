@@ -2,7 +2,7 @@ rule set_kernel:
     input:
         f'{workflow.basedir}/envs/pythonGenomics.yaml'
     output:
-        touch("resources/.kernel.set")
+        touch("results/.kernel.set")
     conda: f'{workflow.basedir}/envs/pythonGenomics.yaml'
     log:
         "logs/set_kernel.log"
@@ -16,14 +16,14 @@ def getVCFs(gz=True, allcontigs=False, allcontigsseparately=False):
 
     if allcontigs == False:
         if gz == True:
-            genotypes = expand("resources/vcfs/{sample_set}_{{contig}}.vcf.gz", sample_set=sample_sets)
+            genotypes = expand("results/vcfs/{sample_set}_{{contig}}.vcf.gz", sample_set=sample_sets)
         elif gz == False:
-            genotypes = expand("resources/vcfs/{sample_set}_{{contig}}.vcf", sample_set=sample_sets)
+            genotypes = expand("results/vcfs/{sample_set}_{{contig}}.vcf", sample_set=sample_sets)
     elif allcontigs == True:
         if gz == True:
-            genotypes =  expand("resources/vcfs/wholegenome/{sample_set}.vcf.gz", sample_set=sample_sets)
+            genotypes =  expand("results/vcfs/wholegenome/{sample_set}.vcf.gz", sample_set=sample_sets)
         elif gz == False:
-            genotypes = expand("resources/vcfs/wholegenome/{sample_set}.vcf", sample_set=sample_sets)
+            genotypes = expand("results/vcfs/wholegenome/{sample_set}.vcf", sample_set=sample_sets)
     
     if allcontigsseparately:
         genotypes = expand(genotypes, contig=contigs)

@@ -3,7 +3,7 @@ rule ZarrToHaplotypesVCF:
     Write out haplotypes VCF files from provided malariagen_data
     """
     output:
-        haplotypeVCF = "resources/vcfs/{sample_set}_{contig}.vcf"
+        haplotypeVCF = "results/vcfs/{sample_set}_{contig}.vcf"
     conda:
         "../envs/pythonGenomics.yaml"
     log:
@@ -28,6 +28,7 @@ rule BGZip:
         calls_gz = gzippedVCF
     log:
         "logs/bgzip/{contig}.log"
+    priority: 100
     shell:
         """
         bgzip {input.calls} 2> {log}
@@ -37,7 +38,7 @@ rule BcftoolsIndex:
     input:
         calls = getVCFs(gz=True)
     output:
-        calls_gz = "resources/vcfs/{sample_set}_{contig}.vcf.gz.csi",
+        calls_gz = "results/vcfs/{sample_set}_{contig}.vcf.gz.csi",
     log:
         "logs/bcftoolsIndex/{sample_set}_{contig}.log",
     shell:
@@ -49,7 +50,7 @@ rule Tabix:
     input:
         calls = getVCFs(gz=True)
     output:
-        calls_tbi = "resources/vcfs/{sample_set}_{contig}.vcf.gz.tbi",
+        calls_tbi = "results/vcfs/{sample_set}_{contig}.vcf.gz.tbi",
     log:
         "logs/tabix/{sample_set}_{contig}.log",
     shell:
@@ -64,7 +65,7 @@ rule concatVCFs:
         tbi = lambda wildcards: [vcf+".tbi" for vcf in getVCFs(gz=True, allcontigs=False, allcontigsseparately=True)],
         csi = lambda wildcards: [vcf+".csi" for vcf in getVCFs(gz=True, allcontigs=False, allcontigsseparately=True)],
     output:
-        cattedVCF = "resources/vcfs/wholegenome/{sample_set}.vcf.gz",
+        cattedVCF = "results/vcfs/wholegenome/{sample_set}.vcf.gz",
     log:
         "logs/bcftoolsConcat/{sample_set}.log",
     threads: 8
@@ -78,7 +79,7 @@ rule BcftoolsIndex_cattedVCF:
     input:
         calls = lambda wildcards: getVCFs(gz=True, allcontigs=True)
     output:
-        calls_gz = "resources/vcfs/wholegenome/{sample_set}.vcf.gz.csi",
+        calls_gz = "results/vcfs/wholegenome/{sample_set}.vcf.gz.csi",
     log:
         "logs/bcftoolsIndex/{sample_set}.log",
     shell:
@@ -91,7 +92,7 @@ rule Tabix_cattedVCF:
     input:
         calls = lambda wildcards: getVCFs(gz=True, allcontigs=True)
     output:
-        calls_tbi = "resources/vcfs/wholegenome/{sample_set}.vcf.gz.tbi",
+        calls_tbi = "results/vcfs/wholegenome/{sample_set}.vcf.gz.tbi",
     log:
         "logs/tabix/{sample_set}.log",
     shell:

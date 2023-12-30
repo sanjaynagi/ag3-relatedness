@@ -95,7 +95,7 @@ def write_vcf_header(vcf_file, contig):
     # write source
     print('##source=scikit-allel-%s + ZarrToVCF.py' % allel.__version__, file=vcf_file)
     #write refs and contigs 
-    print('##reference=resources/reference/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa', file=vcf_file)
+    print('##reference=results/reference/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa', file=vcf_file)
     print('##contig=<ID=2R,length=61545105>', file=vcf_file) if contig == '2R' else None
     print('##contig=<ID=3R,length=53200684>', file=vcf_file) if contig == '3R' else None 
     print('##contig=<ID=2L,length=49364325>', file=vcf_file) if contig == '2L' else None
@@ -114,15 +114,21 @@ sampleNameColumn = 'partner_sample_id'
 sample_query = None
 
 import malariagen_data
-ag3 = malariagen_data.Ag3(pre=True, gcs_cache='gcs_cache', results_cache='results_cache')
+ag3 = malariagen_data.Ag3(
+    pre=True, 
+    gcs_cache='home/snagi/lstm_projects/ag3-relatedness/gcs_cache', 
+    results_cache='/home/snagi/lstm_projects/ag3-relatedness/results_cache'
+)
+
 metadata = ag3.sample_metadata(sample_sets=sample_set, sample_query=sample_query)
 
 print(f"Running for {contig}...")
 
 ### MAIN ####
 ZarrToPandasToHaplotypeVCF(
-     f"resources/vcfs/{sample_set}_{contig}.vcf", 
+     f"results/vcfs/{sample_set}_{contig}.vcf", 
      metadata=metadata,
+     analysis=analysis,
      sample_query=sample_query,
      contig=contig, 
      nchunks=20, 

@@ -3,11 +3,11 @@ rule mask_inversions:
     Mask inversions in vcf files
     """
     input:
-        vcf = "resources/vcfs/wholegenome/{sample_set}.vcf.gz",
-        csi = "resources/vcfs/wholegenome/{sample_set}.vcf.gz.csi",
-        tbi = "resources/vcfs/wholegenome/{sample_set}.vcf.gz.tbi",
+        vcf = "results/vcfs/wholegenome/{sample_set}.vcf.gz",
+        csi = "results/vcfs/wholegenome/{sample_set}.vcf.gz.csi",
+        tbi = "results/vcfs/wholegenome/{sample_set}.vcf.gz.tbi",
     output:
-        vcf = "resources/vcfs/wholegenome.masked/{sample_set}.vcf.gz"
+        vcf = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz"
     log:
         log = "logs/mask_inversions/{sample_set}.log"
     params:
@@ -20,9 +20,9 @@ rule mask_inversions:
 
 rule BcftoolsIndex_masked:
     input:
-        vcf = "resources/vcfs/wholegenome.masked/{sample_set}.vcf.gz"
+        vcf = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz"
     output:
-        vcf_gz = "resources/vcfs/wholegenome.masked/{sample_set}.vcf.gz.csi",
+        vcf_gz = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz.csi",
     log:
         "logs/bcftoolsIndex/{sample_set}_masked.log",
     shell:
@@ -32,9 +32,9 @@ rule BcftoolsIndex_masked:
 
 rule Tabix_masked:
     input:
-        vcf = "resources/vcfs/wholegenome.masked/{sample_set}.vcf.gz"
+        vcf = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz"
     output:
-        vcf_tbi = "resources/vcfs/wholegenome.masked/{sample_set}.vcf.gz.tbi",
+        vcf_tbi = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz.tbi",
     log:
         "logs/tabix/{sample_set}.masked.log"
     shell:
@@ -44,12 +44,12 @@ rule Tabix_masked:
 
 rule ngsRelate:
     """
-    Run NGSRelate on VCF files
+    Mask inversions in vcf files
     """
     input:
-        vcf = "resources/vcfs/wholegenome.masked/{sample_set}.vcf.gz",
-        csi = "resources/vcfs/wholegenome.masked/{sample_set}.vcf.gz.csi",
-        tbi = "resources/vcfs/wholegenome.masked/{sample_set}.vcf.gz.tbi",
+        vcf = "resources/vcfs/wholegenome/{sample_set}.vcf.gz",
+        csi = "resources/vcfs/wholegenome/{sample_set}.vcf.gz.csi",
+        tbi = "resources/vcfs/wholegenome/{sample_set}.vcf.gz.tbi",
     output:
         "results/relatedness/ngsRelate.{sample_set}"
     log:

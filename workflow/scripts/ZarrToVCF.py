@@ -52,7 +52,7 @@ def write_vcf_header(vcf_file, contig):
     # write source
     print('##source=scikit-allel-%s + ZarrToVCF.py' % allel.__version__, file=vcf_file)
     #write refs and contigs 
-    print('##reference=resources/reference/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa', file=vcf_file)
+    print('##reference=results/reference/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa', file=vcf_file)
     print('##contig=<ID=2R,length=61545105>', file=vcf_file) if contig == '2R' else None
     print('##contig=<ID=3R,length=53200684>', file=vcf_file) if contig == '3R' else None 
     print('##contig=<ID=2L,length=49364325>', file=vcf_file) if contig == '2L' else None
@@ -156,5 +156,5 @@ def ZarrToPandasToVCF(vcf_file, genotypePath, positionsPath, siteFilterPath, con
 
 ### MAIN ####
 
-#ZarrToPandasToVCF(f"../resources/vcfs/ag3_gaardian_{contig}.multiallelic.vcf", genotypePath, positionsPath, siteFilterPath, contig, snpfilter="segregating")
-ZarrToPandasToVCF(f"resources/vcfs/{dataset}_{contig}.biallelic.vcf", genotypePath, positionsPath, siteFilterPath, contig, snpfilter="biallelic")
+#ZarrToPandasToVCF(f"../results/vcfs/ag3_gaardian_{contig}.multiallelic.vcf", genotypePath, positionsPath, siteFilterPath, contig, snpfilter="segregating")
+ZarrToPandasToVCF(f"results/vcfs/{dataset}_{contig}.biallelic.vcf", genotypePath, positionsPath, siteFilterPath, contig, snpfilter="biallelic")
