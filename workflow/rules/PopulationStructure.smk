@@ -47,9 +47,9 @@ rule ngsRelate:
     Mask inversions in vcf files
     """
     input:
-        vcf = "resources/vcfs/wholegenome/{sample_set}.vcf.gz",
-        csi = "resources/vcfs/wholegenome/{sample_set}.vcf.gz.csi",
-        tbi = "resources/vcfs/wholegenome/{sample_set}.vcf.gz.tbi",
+        vcf = "results/vcfs/wholegenome/{sample_set}.vcf.gz",
+        csi = "results/vcfs/wholegenome/{sample_set}.vcf.gz.csi",
+        tbi = "results/vcfs/wholegenome/{sample_set}.vcf.gz.tbi",
     output:
         "results/relatedness/ngsRelate.{sample_set}"
     log:

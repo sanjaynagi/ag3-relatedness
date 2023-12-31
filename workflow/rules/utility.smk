@@ -10,6 +10,7 @@ rule ZarrToHaplotypesVCF:
         "logs/ZarrToVCF_haplotypes/{sample_set}_{contig}.log"
     resources:
         tot=1
+    priority: 10
     params:
         basedir=workflow.basedir,
         dataset=dataset
@@ -61,9 +62,9 @@ rule Tabix:
 
 rule concatVCFs:
     input:
-        calls = lambda wildcards: getVCFs(gz=True, allcontigs=False, allcontigsseparately=True),
-        tbi = lambda wildcards: [vcf+".tbi" for vcf in getVCFs(gz=True, allcontigs=False, allcontigsseparately=True)],
-        csi = lambda wildcards: [vcf+".csi" for vcf in getVCFs(gz=True, allcontigs=False, allcontigsseparately=True)],
+        calls = expand("results/vcfs/{{sample_set}}_{contig}.vcf.gz", contig=config["contigs"]),
+        tbi = expand("results/vcfs/{{sample_set}}_{contig}.vcf.gz.tbi", contig=config["contigs"]),
+        csi = expand("results/vcfs/{{sample_set}}_{contig}.vcf.gz.csi", contig=config["contigs"]),
     output:
         cattedVCF = "results/vcfs/wholegenome/{sample_set}.vcf.gz",
     log:
