@@ -12,24 +12,6 @@ rule set_kernel:
         """
 
 
-def getVCFs(gz=True, allcontigs=False, allcontigsseparately=False):
-
-    if allcontigs == False:
-        if gz == True:
-            genotypes = expand("results/vcfs/{sample_set}_{{contig}}.vcf.gz", sample_set=sample_sets)
-        elif gz == False:
-            genotypes = expand("results/vcfs/{sample_set}_{{contig}}.vcf", sample_set=sample_sets)
-    elif allcontigs == True:
-        if gz == True:
-            genotypes =  expand("results/vcfs/wholegenome/{sample_set}.vcf.gz", sample_set=sample_sets)
-        elif gz == False:
-            genotypes = expand("results/vcfs/wholegenome/{sample_set}.vcf", sample_set=sample_sets)
-    
-    if allcontigsseparately:
-        genotypes = expand(genotypes, contig=contigs)
-
-    return(genotypes)
-
 
 
 def singleTrue(iterable):

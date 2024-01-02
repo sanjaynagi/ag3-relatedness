@@ -9,7 +9,7 @@ rule ZarrToHaplotypesVCF:
     log:
         "logs/ZarrToVCF_haplotypes/{sample_set}_{contig}.log"
     resources:
-        tot=1
+         tot=1
     priority: 10
     params:
         basedir=workflow.basedir,
@@ -17,18 +17,16 @@ rule ZarrToHaplotypesVCF:
     script:
         "../scripts/ZarrToVCF_haplotypes.py"
 
-
-gzippedVCF = getVCFs(gz=True)
 rule BGZip:
     """
     This is overwriting log files at the
     """
     input:
-        calls = getVCFs(gz=False)
+        calls = "results/vcfs/{sample_set}_{contig}.vcf"
     output:
-        calls_gz = gzippedVCF
+        calls_gz = "results/vcfs/{sample_set}_{contig}.vcf.gz"
     log:
-        "logs/bgzip/{contig}.log"
+        "logs/bgzip/{sample_set}/{contig}.log"
     priority: 100
     shell:
         """
@@ -37,7 +35,7 @@ rule BGZip:
 
 rule BcftoolsIndex:
     input:
-        calls = getVCFs(gz=True)
+        calls = "results/vcfs/{sample_set}_{contig}.vcf.gz"
     output:
         calls_gz = "results/vcfs/{sample_set}_{contig}.vcf.gz.csi",
     log:
@@ -49,7 +47,7 @@ rule BcftoolsIndex:
 
 rule Tabix:
     input:
-        calls = getVCFs(gz=True)
+        calls = "results/vcfs/{sample_set}_{contig}.vcf.gz"
     output:
         calls_tbi = "results/vcfs/{sample_set}_{contig}.vcf.gz.tbi",
     log:
@@ -78,7 +76,7 @@ rule concatVCFs:
 
 rule BcftoolsIndex_cattedVCF:
     input:
-        calls = lambda wildcards: getVCFs(gz=True, allcontigs=True)
+        calls = "results/vcfs/wholegenome/{sample_set}.vcf.gz"
     output:
         calls_gz = "results/vcfs/wholegenome/{sample_set}.vcf.gz.csi",
     log:
@@ -91,7 +89,7 @@ rule BcftoolsIndex_cattedVCF:
 
 rule Tabix_cattedVCF:
     input:
-        calls = lambda wildcards: getVCFs(gz=True, allcontigs=True)
+        calls = "results/vcfs/wholegenome/{sample_set}.vcf.gz"
     output:
         calls_tbi = "results/vcfs/wholegenome/{sample_set}.vcf.gz.tbi",
     log:

@@ -22,7 +22,7 @@ rule BcftoolsIndex_masked:
     input:
         vcf = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz"
     output:
-        vcf_gz = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz.csi",
+        vcf_gz = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz.csi"
     log:
         "logs/bcftoolsIndex/{sample_set}_masked.log",
     shell:
