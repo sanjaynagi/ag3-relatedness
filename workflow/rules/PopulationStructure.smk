@@ -3,11 +3,11 @@ rule mask_inversions:
     Mask inversions in vcf files
     """
     input:
-        vcf = "results/vcfs/wholegenome/{sample_set}.vcf.gz",
-        csi = "results/vcfs/wholegenome/{sample_set}.vcf.gz.csi",
-        tbi = "results/vcfs/wholegenome/{sample_set}.vcf.gz.tbi",
+        vcf = config['release'] + "_results/vcfs/wholegenome/{sample_set}.vcf.gz",
+        csi = config['release'] + "_results/vcfs/wholegenome/{sample_set}.vcf.gz.csi",
+        tbi = config['release'] + "_results/vcfs/wholegenome/{sample_set}.vcf.gz.tbi",
     output:
-        vcf = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz"
+        vcf = config['release'] + "_results/vcfs/wholegenome.masked/{sample_set}.vcf.gz"
     log:
         log = "logs/mask_inversions/{sample_set}.log"
     params:
@@ -19,9 +19,9 @@ rule mask_inversions:
 
 rule BcftoolsIndex_masked:
     input:
-        vcf = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz"
+        vcf = config['release'] + "_results/vcfs/wholegenome.masked/{sample_set}.vcf.gz"
     output:
-        vcf_gz = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz.csi"
+        vcf_gz = config['release'] + "_results/vcfs/wholegenome.masked/{sample_set}.vcf.gz.csi"
     log:
         "logs/bcftoolsIndex/{sample_set}_masked.log",
     shell:
@@ -31,9 +31,9 @@ rule BcftoolsIndex_masked:
 
 rule Tabix_masked:
     input:
-        vcf = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz"
+        vcf = config['release'] + "_results/vcfs/wholegenome.masked/{sample_set}.vcf.gz"
     output:
-        vcf_tbi = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz.tbi",
+        vcf_tbi = config['release'] + "_results/vcfs/wholegenome.masked/{sample_set}.vcf.gz.tbi",
     log:
         "logs/tabix/{sample_set}.masked.log"
     shell:
@@ -46,11 +46,11 @@ rule ngsRelate:
     Mask inversions in vcf files
     """
     input:
-        vcf = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz",
-        csi = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz.csi",
-        tbi = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz.tbi",
+        vcf = config['release'] + "_results/vcfs/wholegenome.masked/{sample_set}.vcf.gz",
+        csi = config['release'] + "_results/vcfs/wholegenome.masked/{sample_set}.vcf.gz.csi",
+        tbi = config['release'] + "_results/vcfs/wholegenome.masked/{sample_set}.vcf.gz.tbi",
     output:
-        "results/relatedness/ngsRelate.{sample_set}"
+        config['release'] + "_results/relatedness/ngsRelate.{sample_set}"
     log:
         log = "logs/ngsRelate/{sample_set}.log"
     params:

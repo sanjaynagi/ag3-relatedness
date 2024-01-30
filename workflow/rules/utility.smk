@@ -3,7 +3,7 @@ rule ZarrToHaplotypesVCF:
     Write out haplotypes VCF files from provided malariagen_data
     """
     output:
-        haplotypeVCF = "results/vcfs/{sample_set}_{contig}.vcf"
+        haplotypeVCF = config['release'] + "_results/vcfs/{sample_set}_{contig}.vcf"
     conda:
         "../envs/pythonGenomics.yaml"
     log:
@@ -23,9 +23,9 @@ rule BGZip:
     This is overwriting log files at the
     """
     input:
-        calls = "results/vcfs/{sample_set}_{contig}.vcf"
+        calls = config['release'] + "_results/vcfs/{sample_set}_{contig}.vcf"
     output:
-        calls_gz = "results/vcfs/{sample_set}_{contig}.vcf.gz"
+        calls_gz = config['release'] + "_results/vcfs/{sample_set}_{contig}.vcf.gz"
     log:
         "logs/bgzip/{sample_set}/{contig}.log"
     shell:
@@ -35,9 +35,9 @@ rule BGZip:
 
 rule BcftoolsIndex:
     input:
-        calls = "results/vcfs/{sample_set}_{contig}.vcf.gz"
+        calls = config['release'] + "_results/vcfs/{sample_set}_{contig}.vcf.gz"
     output:
-        calls_gz = "results/vcfs/{sample_set}_{contig}.vcf.gz.csi",
+        calls_gz = config['release'] + "_results/vcfs/{sample_set}_{contig}.vcf.gz.csi",
     log:
         "logs/bcftoolsIndex/{sample_set}_{contig}.log",
     shell:
@@ -47,9 +47,9 @@ rule BcftoolsIndex:
 
 rule Tabix:
     input:
-        calls = "results/vcfs/{sample_set}_{contig}.vcf.gz"
+        calls = config['release'] + "_results/vcfs/{sample_set}_{contig}.vcf.gz"
     output:
-        calls_tbi = "results/vcfs/{sample_set}_{contig}.vcf.gz.tbi",
+        calls_tbi = config['release'] + "_results/vcfs/{sample_set}_{contig}.vcf.gz.tbi",
     log:
         "logs/tabix/{sample_set}_{contig}.log",
     shell:
@@ -60,11 +60,11 @@ rule Tabix:
 
 rule concatVCFs:
     input:
-        calls = expand("results/vcfs/{{sample_set}}_{contig}.vcf.gz", contig=config["contigs"]),
-        tbi = expand("results/vcfs/{{sample_set}}_{contig}.vcf.gz.tbi", contig=config["contigs"]),
-        csi = expand("results/vcfs/{{sample_set}}_{contig}.vcf.gz.csi", contig=config["contigs"]),
+        calls = expand(config['release'] + "_results/vcfs/{{sample_set}}_{contig}.vcf.gz", contig=config["contigs"]),
+        tbi = expand(config['release'] + "_results/vcfs/{{sample_set}}_{contig}.vcf.gz.tbi", contig=config["contigs"]),
+        csi = expand(config['release'] + "_results/vcfs/{{sample_set}}_{contig}.vcf.gz.csi", contig=config["contigs"]),
     output:
-        cattedVCF = "results/vcfs/wholegenome/{sample_set}.vcf.gz",
+        cattedVCF = config['release'] + "_results/vcfs/wholegenome/{sample_set}.vcf.gz",
     log:
         "logs/bcftoolsConcat/{sample_set}.log",
     threads: 8
@@ -76,9 +76,9 @@ rule concatVCFs:
 
 rule BcftoolsIndex_cattedVCF:
     input:
-        calls = "results/vcfs/wholegenome/{sample_set}.vcf.gz"
+        calls = config['release'] + "_results/vcfs/wholegenome/{sample_set}.vcf.gz"
     output:
-        calls_gz = "results/vcfs/wholegenome/{sample_set}.vcf.gz.csi",
+        calls_gz = config['release'] + "_results/vcfs/wholegenome/{sample_set}.vcf.gz.csi",
     log:
         "logs/bcftoolsIndex/{sample_set}.log",
     shell:
@@ -89,9 +89,9 @@ rule BcftoolsIndex_cattedVCF:
 
 rule Tabix_cattedVCF:
     input:
-        calls = "results/vcfs/wholegenome/{sample_set}.vcf.gz"
+        calls = config['release'] + "_results/vcfs/wholegenome/{sample_set}.vcf.gz"
     output:
-        calls_tbi = "results/vcfs/wholegenome/{sample_set}.vcf.gz.tbi",
+        calls_tbi = config['release'] + "_results/vcfs/wholegenome/{sample_set}.vcf.gz.tbi",
     log:
         "logs/tabix/{sample_set}.log",
     shell:

@@ -137,7 +137,7 @@ print(f"Running for {contig}...")
 
 ### MAIN ####
 ZarrToPandasToHaplotypeVCF(
-     f"results/vcfs/{sample_set}_{contig}.vcf", 
+     f"{data_resource}_results/vcfs/{sample_set}_{contig}.vcf", 
      metadata=metadata,
      data_resource=data_resource,
      analysis=analysis,
