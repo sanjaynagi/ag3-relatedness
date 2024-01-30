@@ -15,7 +15,7 @@ import allel
 from datetime import date
 from pathlib import Path
 
-def ZarrToPandasToHaplotypeVCF(vcf_file, metadata, sample_sets, contig, sample_query=None, analysis='gamb_colu', nchunks=50, sampleNameColumn = 'partner_sample_id'):
+def ZarrToPandasToHaplotypeVCF(vcf_file, data_resource, metadata, sample_sets, contig, sample_query=None, analysis='gamb_colu', nchunks=50, sampleNameColumn = 'partner_sample_id'):
     
     """
     Converts genotype and POS arrays to vcf, using pd dataframes in chunks. 
@@ -30,7 +30,7 @@ def ZarrToPandasToHaplotypeVCF(vcf_file, metadata, sample_sets, contig, sample_q
     
     print(f"Loading array for {contig}...")
 
-    ds_haps = ag3.haplotypes(contig, sample_sets=sample_sets, sample_query=sample_query, analysis=analysis)
+    ds_haps = data_resource.haplotypes(contig, sample_sets=sample_sets, sample_query=sample_query, analysis=analysis)
     sample_ids = ds_haps['sample_id'].values
     metadata = metadata.set_index('sample_id').loc[sample_ids, :].reset_index()
     positions = ds_haps['variant_position']
@@ -105,8 +105,9 @@ def write_vcf_header(vcf_file, contig):
 
 import sys
 
+
+release = snakemake.params['release']
 sample_set = snakemake.wildcards['sample_set'] #["1288-VO-UG-DONNELLY-VMF00168","1288-VO-UG-DONNELLY-VMF00219"] #'1244-VO-GH-YAWSON-VMF00149' 
-analysis = 'gamb_colu_arab'
 contig = snakemake.wildcards['contig']
 dataset = snakemake.params['dataset']
 sampleNameColumn = 'partner_sample_id'
@@ -114,13 +115,23 @@ sampleNameColumn = 'partner_sample_id'
 sample_query = None
 
 import malariagen_data
-ag3 = malariagen_data.Ag3(
-    pre=True, 
-    gcs_cache='home/snagi/lstm_projects/ag3-relatedness/gcs_cache', 
-    results_cache='/home/snagi/lstm_projects/ag3-relatedness/results_cache'
-)
+if release == 'ag3':
+    data_resource = malariagen_data.Ag3(
+        pre=True, 
+        gcs_cache='home/snagi/lstm_projects/ag3-relatedness/gcs_cache', 
+        results_cache='/home/snagi/lstm_projects/ag3-relatedness/results_cache'
+    )
+    analysis = 'gamb_colu_arab'
+elif release == 'af1':
+    data_resource = malariagen_data.Af1(
+        pre=True, 
+        gcs_cache='home/snagi/lstm_projects/ag3-relatedness/gcs_cache', 
+        results_cache='/home/snagi/lstm_projects/ag3-relatedness/results_cache'
+    )
+    analysis = 'funestus'
 
-metadata = ag3.sample_metadata(sample_sets=sample_set, sample_query=sample_query)
+
+metadata = data_resource.sample_metadata(sample_sets=sample_set, sample_query=sample_query)
 
 print(f"Running for {contig}...")
 
@@ -128,6 +139,7 @@ print(f"Running for {contig}...")
 ZarrToPandasToHaplotypeVCF(
      f"results/vcfs/{sample_set}_{contig}.vcf", 
      metadata=metadata,
+     data_resource=data_resource,
      analysis=analysis,
      sample_query=sample_query,
      contig=contig, 

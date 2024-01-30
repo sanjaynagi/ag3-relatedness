@@ -11,11 +11,10 @@ rule mask_inversions:
     log:
         log = "logs/mask_inversions/{sample_set}.log"
     params:
-        mask_2la = "2RL:81545105-104545105",
-        mask_2rbc = "2RL:18000000-32000000",
+        mask_regions = "^" + "^,".join(config['mask_region'])
     shell:
         """
-        bcftools view -t ^{params.mask_2la},^{params.mask_2rbc} -O z -o {output.vcf} {input.vcf} 2> {log}
+        bcftools view -t {params.mask_regions} -O z -o {output.vcf} {input.vcf} 2> {log}
         """
 
 rule BcftoolsIndex_masked:
@@ -47,9 +46,9 @@ rule ngsRelate:
     Mask inversions in vcf files
     """
     input:
-        vcf = "results/vcfs/wholegenome/{sample_set}.vcf.gz",
-        csi = "results/vcfs/wholegenome/{sample_set}.vcf.gz.csi",
-        tbi = "results/vcfs/wholegenome/{sample_set}.vcf.gz.tbi",
+        vcf = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz",
+        csi = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz.csi",
+        tbi = "results/vcfs/wholegenome.masked/{sample_set}.vcf.gz.tbi",
     output:
         "results/relatedness/ngsRelate.{sample_set}"
     log:

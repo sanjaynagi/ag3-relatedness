@@ -13,7 +13,8 @@ rule ZarrToHaplotypesVCF:
     priority: 10
     params:
         basedir=workflow.basedir,
-        dataset=dataset
+        dataset=dataset,
+        release=config['release']
     script:
         "../scripts/ZarrToVCF_haplotypes.py"
 
@@ -27,7 +28,6 @@ rule BGZip:
         calls_gz = "results/vcfs/{sample_set}_{contig}.vcf.gz"
     log:
         "logs/bgzip/{sample_set}/{contig}.log"
-    priority: 100
     shell:
         """
         bgzip {input.calls} 2> {log}
