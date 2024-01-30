@@ -1,0 +1,66 @@
+# Dataset name
+dataset: 'ag3_ug'
+release: 'ag3' #ag3 or af1
+sample_sets: 
+      - 'AG1000G-AO'
+      - 'AG1000G-BF-A'
+      - 'AG1000G-BF-B'
+      - 'AG1000G-BF-C'
+      - 'AG1000G-CD'
+      - 'AG1000G-CF'
+      - 'AG1000G-CI'
+ #     - 'AG1000G-CM-A'
+      - 'AG1000G-CM-B'
+      - 'AG1000G-CM-C'
+      - 'AG1000G-FR'
+      - 'AG1000G-GA-A'
+      - 'AG1000G-GH'
+      - 'AG1000G-GM-A'
+      - 'AG1000G-GM-B'
+      - 'AG1000G-GM-C'
+      - 'AG1000G-GN-A'
+      - 'AG1000G-GN-B'
+      - 'AG1000G-GQ'
+      - 'AG1000G-GW'
+      - 'AG1000G-KE'
+      - 'AG1000G-ML-A'
+      - 'AG1000G-ML-B'
+      - 'AG1000G-MW'
+      - 'AG1000G-MZ' 
+      - 'AG1000G-TZ'
+      - 'AG1000G-UG'
+      - 1237-VO-BJ-DJOGBENOU-VMF00050
+      - 1244-VO-GH-YAWSON-VMF00051
+      - 1253-VO-TG-DJOGBENOU-VMF00052
+      - 1237-VO-BJ-DJOGBENOU-VMF00067
+      - 1245-VO-CI-CONSTANT-VMF00054
+      - 1244-VO-GH-YAWSON-VMF00149
+      - 1246-VO-TZ-KABULA-VMF00185
+      - 1237-VO-BJ-DJOGBENOU-VMF00212
+      - 1246-VO-TZ-KABULA-VMF00197
+      - 1288-VO-UG-DONNELLY-VMF00168
+      - 1288-VO-UG-DONNELLY-VMF00219
+
+sample_query: None
+mask_regions:
+      - 2RL:81545105-104545105
+      - 2RL:18000000-32000000
+
+gcs_cache: "gcs_cache"
+results_cache: "results_cache"
+
+# Chromosome names. Should correspond to the reference fasta/gff files. 
+contigs: ['2RL', '3RL', 'X']
+
+
+# Run analysis with compkaryo to determine proportion % karyotype
+karyotype:
+        activate: False
+        inversions:
+             - "2La"
+             - "2Rj"
+             - "2Rb"
+             - "2Rc_col"
+             - "2Rc_gam"
+             - "2Rd"
+             - "2Ru"
