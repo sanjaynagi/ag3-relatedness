@@ -11,7 +11,7 @@ rule mask_inversions:
     log:
         log = "logs/mask_inversions/{sample_set}.log"
     params:
-        mask_regions = "^" + "^,".join(config['mask_region'])
+        mask_regions = "^" + "^,".join(config['mask_regions'])
     shell:
         """
         bcftools view -t {params.mask_regions} -O z -o {output.vcf} {input.vcf} 2> {log}

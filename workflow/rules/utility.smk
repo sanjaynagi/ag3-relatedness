@@ -1,4 +1,4 @@
-rule ZarrToHaplotypesVCF:
+rule MalariaGEN_dataToVCF:
     """
     Write out haplotypes VCF files from provided malariagen_data
     """
@@ -7,16 +7,17 @@ rule ZarrToHaplotypesVCF:
     conda:
         "../envs/pythonGenomics.yaml"
     log:
-        "logs/ZarrToVCF_haplotypes/{sample_set}_{contig}.log"
+        "logs/ZarrToVCF/{sample_set}_{contig}.log"
     resources:
          tot=1
     priority: 10
     params:
         basedir=workflow.basedir,
         dataset=dataset,
-        release=config['release']
+        release=config['release'],
+        haplotypes=config['haplotypes'],
     script:
-        "../scripts/ZarrToVCF_haplotypes.py"
+        "../scripts/ZarrToVCF.py"
 
 rule BGZip:
     """
