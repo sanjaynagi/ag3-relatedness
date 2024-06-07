@@ -15,7 +15,7 @@ import allel
 from datetime import date
 from pathlib import Path
 
-def ZarrToPandasToVCF(vcf_file, data_resource, metadata, sample_sets, contig, haplotypes, sample_query=None, analysis='gamb_colu', nchunks=50, sampleNameColumn = 'partner_sample_id'):
+def ZarrToPandasToHaplotypeVCF(vcf_file, data_resource, metadata, sample_sets, contig, sample_query=None, analysis='gamb_colu', nchunks=50, sampleNameColumn = 'partner_sample_id'):
     
     """
     Converts genotype and POS arrays to vcf, using pd dataframes in chunks. 
@@ -30,18 +30,14 @@ def ZarrToPandasToVCF(vcf_file, data_resource, metadata, sample_sets, contig, ha
     
     print(f"Loading array for {contig}...")
 
-    if haplotypes:
-        ds_snps = data_resource.haplotypes(contig, sample_sets=sample_sets, sample_query=sample_query, analysis=analysis)
-    else:
-        ds_snps = data_resource.biallelic_snp_calls(contig, sample_sets=sample_sets, sample_query=sample_query, site_mask=analysis)
-    
-    sample_ids = ds_snps['sample_id'].values
+    ds_haps = data_resource.haplotypes(contig, sample_sets=sample_sets, sample_query=sample_query, analysis=analysis)
+    sample_ids = ds_haps['sample_id'].values
     metadata = metadata.set_index('sample_id').loc[sample_ids, :].reset_index()
-    positions = ds_snps['variant_position']
-    geno = allel.GenotypeDaskArray(ds_snps['call_genotype'])
+    positions = ds_haps['variant_position']
+    geno = allel.GenotypeDaskArray(ds_haps['call_genotype'])
 
-    refs = ds_snps['variant_allele'][:,0].compute().values.astype(str)
-    alts = ds_snps['variant_allele'][:,1].compute().values.astype(str)
+    refs = ds_haps['variant_allele'][:,0].compute().values.astype(str)
+    alts = ds_haps['variant_allele'][:,1].compute().values.astype(str)
   
     print("calculating chunks sizes...")
     chunks = np.round(np.arange(0, geno.shape[0], geno.shape[0]/nchunks)).astype(int).tolist()
@@ -109,12 +105,12 @@ def write_vcf_header(vcf_file, contig):
 
 import sys
 
+
 release = snakemake.params['release']
 sample_set = snakemake.wildcards['sample_set'] #["1288-VO-UG-DONNELLY-VMF00168","1288-VO-UG-DONNELLY-VMF00219"] #'1244-VO-GH-YAWSON-VMF00149' 
 contig = snakemake.wildcards['contig']
 dataset = snakemake.params['dataset']
 sampleNameColumn = 'partner_sample_id'
-haplotypes = snakemake.params['haplotypes']
 #sample_query = snakemake.params['sample_query']
 sample_query = None
 
@@ -122,14 +118,14 @@ import malariagen_data
 if release == 'ag3':
     data_resource = malariagen_data.Ag3(
         pre=True, 
-        simple_cache=dict(cache_storage='home/snagi/lstm_projects/ag3-relatedness/gcs_cache'), 
+        gcs_cache='home/snagi/lstm_projects/ag3-relatedness/gcs_cache', 
         results_cache='/home/snagi/lstm_projects/ag3-relatedness/results_cache'
     )
     analysis = 'gamb_colu_arab'
 elif release == 'af1':
     data_resource = malariagen_data.Af1(
         pre=True, 
-        simple_cache=dict(cache_storage='home/snagi/lstm_projects/ag3-relatedness/gcs_cache'), 
+        gcs_cache='home/snagi/lstm_projects/ag3-relatedness/gcs_cache', 
         results_cache='/home/snagi/lstm_projects/ag3-relatedness/results_cache'
     )
     analysis = 'funestus'
@@ -140,13 +136,12 @@ metadata = data_resource.sample_metadata(sample_sets=sample_set, sample_query=sa
 print(f"Running for {contig}...")
 
 ### MAIN ####
-ZarrToPandasToVCF(
+ZarrToPandasToHaplotypeVCF(
      f"{release}_results/vcfs/{sample_set}_{contig}.vcf", 
      metadata=metadata,
      data_resource=data_resource,
      analysis=analysis,
      sample_query=sample_query,
-     haplotypes=haplotypes,
      contig=contig, 
      nchunks=20, 
      sample_sets=sample_set

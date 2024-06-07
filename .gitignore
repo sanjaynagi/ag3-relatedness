@@ -19,3 +19,6 @@ crosses.fam
 workflow/dev_notebooks/
 workflow/scripts/selscan*
 results/manifest.tsv
+af1_results/*
+ag3_results/*
+malariagen_data_cache/
