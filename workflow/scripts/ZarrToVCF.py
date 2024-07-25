@@ -148,6 +148,6 @@ ZarrToPandasToVCF(
      sample_query=sample_query,
      haplotypes=haplotypes,
      contig=contig, 
-     nchunks=20, 
+     nchunks=5, 
      sample_sets=sample_set
     )

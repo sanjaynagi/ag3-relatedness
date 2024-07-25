@@ -18,7 +18,9 @@ rule all:
     input:
         # expand(config['release'] + "_results/vcfs/{sample_set}_{contig}.vcf", sample_set=sample_sets, contig=contigs),
         # expand(config['release'] + "_results/vcfs/wholegenome/{sample_set}.vcf.gz.tbi", sample_set=sample_sets),
-        expand(config['release'] + "_results/relatedness/ngsRelate.{sample_set}", sample_set=sample_sets)
+        #expand(config['release'] + "_results/relatedness/ngsRelate.{sample_set}", sample_set=sample_sets),
+        expand(config['release'] + "_results/ibd/{sample_set}/ch{contig}.tsv", sample_set=sample_sets, contig=('2RL', '3RL'))
 
 include: "rules/utility.smk"
 include: "rules/PopulationStructure.smk"
+include: "rules/ibd.smk"

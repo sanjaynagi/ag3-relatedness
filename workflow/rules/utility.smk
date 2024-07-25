@@ -1,4 +1,4 @@
-rule MalariaGEN_dataToVCF:
+rule malariagen_dataToVCF:
     """
     Write out haplotypes VCF files from provided malariagen_data
     """
